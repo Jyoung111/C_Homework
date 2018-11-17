@@ -11,6 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,12 +25,20 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.*;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,7 +47,8 @@ public class LoginActivity extends AppCompatActivity {
     public EditText idText;
     public EditText passText;
     public TextView textView;
-    public String a,id, pwd;
+    public String a,id, pwd,b="http://clc.chosun.ac.kr";
+    public List<String> result = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,13 +132,77 @@ public class LoginActivity extends AppCompatActivity {
                         .cookies(loginTryCookie)
                         .execute();
 
+
                 Document doc3 = response1.parse();
-                Elements elem = doc3.select("div.m-box2");
+                Elements elem = doc3.select("div.m-box2 > ol > li > em.sub_open");
                 //div.m-box2
+                //b = elem.attr("kj");
+
+
+//                WebDriver driver = new ChromeDriver();
+//                driver.get("http://clc.chosun.ac.kr/ilos/main/main_form.acl");
+//                JavascriptExecutor js = (JavascriptExecutor) driver;
+//
+//                js.executeScript("eclassRoom(KJKEY);");
+//
+//                String html = driver.getPageSource();
+//                Document doc4 = Jsoup.parse(html);
+
+                Document doc4 = Jsoup.connect("http://clc.chosun.ac.kr/ilos/st/course/eclass_room2.acl")
+                        .cookies(loginTryCookie)
+                        .data("KJKEY","01201834280401", "returnURI","/ilos/st/course/submain_form.acl","encoding","utf-8")
+                        .ignoreContentType(true)
+                        .post();
+
+                try{
+                    JSONObject jsonObject = new JSONObject(doc4.text());
+                    b += (String) jsonObject.get("returnURL");
+                }catch (JSONException e) {
+                    Toast.makeText(LoginActivity.this, "Fail", Toast.LENGTH_SHORT).show();
+                    Log.e("MYAPP", "unexpected JSON exception", e);
+                }
+                Connection.Response response5 = Jsoup.connect(b)
+                        .cookies(loginTryCookie)
+                        .execute();
+
+
+                Document doc5 = response5.parse();
+                Elements elem3 = doc5.select("div.submain-noticebox");
+
+
+
+
+//                Document doc3 = response1.parse();
+//                Elements elem = doc3.select("div.m-box2 > ol > li > em.sub_open");
+
+                //b = doc4.text();
+
+
+
+//                try {
+//
+//
+//                    JSONObject jsonObject = new JSONObject(doc4.text());
+//                    JSONArray items = (JSONArray)((JSONArray) jsonObject.get("returnURL")).get(1);
+//
+//                    for(int i = 0;i<items.length();i++){
+//                        String item = (String)(((JSONArray) items.get(i)).get(1));
+//                        result.add(item);
+//                    }
+//
+//                } catch (JSONException e) {
+//                    Toast.makeText(LoginActivity.this, "Fail", Toast.LENGTH_SHORT).show();
+//                    Log.e("MYAPP", "unexpected JSON exception", e);
+//                }
+
 
 
                 a = "";
                 for (Element el : elem){
+                    a += el.text() +"\n";
+                }
+
+                for (Element el : elem3){
                     a += el.text() +"\n";
                 }
 

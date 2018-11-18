@@ -1,5 +1,6 @@
 package com.example.jy.chomework;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -40,23 +41,25 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static java.lang.Thread.sleep;
+
 
 public class LoginActivity extends AppCompatActivity {
 
-    public Button button;
+    private boolean flag = false;
+    public Button button,button2;
     public EditText idText;
     public EditText passText;
     public TextView textView;
     public String a,id, pwd,b="http://clc.chosun.ac.kr";
-    public List<String> result = new ArrayList<>();
-
+    private ArrayList<String> class_name = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         button = (Button) findViewById(R.id.button);
+        button2 = (Button) findViewById(R.id.button2);
         idText = (EditText)findViewById(R.id.idText);
         passText = (EditText)findViewById(R.id.passText);
         textView = (TextView) findViewById(R.id.textView);
@@ -66,8 +69,18 @@ public class LoginActivity extends AppCompatActivity {
 
                 SSLConnect ssl = new SSLConnect();
                 ssl.postHttps("https://clc.chosun.ac.kr/ilos/lo/login.acl",1000,1000);
+                id = idText.getText().toString();
+                pwd =  passText.getText().toString();
 
                 new Web_Login().execute();
+
+            }
+        });
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, ListActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -77,6 +90,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+
         }
 
 
@@ -84,8 +99,7 @@ public class LoginActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
 
             try {
-                id = idText.getText().toString();
-                pwd =  passText.getText().toString();
+
                 String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
 
                 // 로그인 페이지 접속
@@ -104,7 +118,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 // 전송할 폼 데이터
                 Map<String, String> data = new HashMap<>();
-                //data.put("returnURL", "http://clc.chosun.ac.kr/ilos/main/member/login_form.acl");
                 data.put("class", "A");
                 data.put("usr_id", id);
                 data.put("usr_pwd", pwd);
@@ -127,7 +140,6 @@ public class LoginActivity extends AppCompatActivity {
                 // 쿠키 중 TSESSION 이라는 값을 확인할 수 있다.
                 Map<String, String> loginCookie = response.cookies();
 
-
                 Connection.Response response1 = Jsoup.connect("http://clc.chosun.ac.kr/ilos/main/main_form.acl")
                         .cookies(loginTryCookie)
                         .execute();
@@ -135,18 +147,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 Document doc3 = response1.parse();
                 Elements elem = doc3.select("div.m-box2 > ol > li > em.sub_open");
-                //div.m-box2
-                //b = elem.attr("kj");
-
-
-//                WebDriver driver = new ChromeDriver();
-//                driver.get("http://clc.chosun.ac.kr/ilos/main/main_form.acl");
-//                JavascriptExecutor js = (JavascriptExecutor) driver;
-//
-//                js.executeScript("eclassRoom(KJKEY);");
-//
-//                String html = driver.getPageSource();
-//                Document doc4 = Jsoup.parse(html);
 
                 Document doc4 = Jsoup.connect("http://clc.chosun.ac.kr/ilos/st/course/eclass_room2.acl")
                         .cookies(loginTryCookie)
@@ -154,67 +154,62 @@ public class LoginActivity extends AppCompatActivity {
                         .ignoreContentType(true)
                         .post();
 
-                try{
-                    JSONObject jsonObject = new JSONObject(doc4.text());
-                    b += (String) jsonObject.get("returnURL");
-                }catch (JSONException e) {
-                    Toast.makeText(LoginActivity.this, "Fail", Toast.LENGTH_SHORT).show();
-                    Log.e("MYAPP", "unexpected JSON exception", e);
+                //로그인 체크
+                Element chk = doc4.select("script").first();
+                if(chk == null){
+                    flag = true;
+                    try{
+                        JSONObject jsonObject = new JSONObject(doc4.text());
+                        b += (String) jsonObject.get("returnURL");
+                    }catch (JSONException e) {
+                        Log.e("MYAPP", "unexpected JSON exception", e);
+                    }
+                    Connection.Response response5 = Jsoup.connect(b)
+                            .cookies(loginTryCookie)
+                            .execute();
+
+                    Document doc5 = response5.parse();
+                    Elements elem3 = doc5.select("div.submain-noticebox");
+
+
+                    a = "";
+                    for (Element el : elem){
+                        a += el.text() +"\n";
+                        class_name.add(el.text()+"\n");
+                    }
+
+                    for (Element el : elem3){
+                        a += el.text() +"\n";
+                    }
                 }
-                Connection.Response response5 = Jsoup.connect(b)
-                        .cookies(loginTryCookie)
-                        .execute();
-
-
-                Document doc5 = response5.parse();
-                Elements elem3 = doc5.select("div.submain-noticebox");
-
-
-
-
-//                Document doc3 = response1.parse();
-//                Elements elem = doc3.select("div.m-box2 > ol > li > em.sub_open");
-
-                //b = doc4.text();
-
-
-
-//                try {
-//
-//
-//                    JSONObject jsonObject = new JSONObject(doc4.text());
-//                    JSONArray items = (JSONArray)((JSONArray) jsonObject.get("returnURL")).get(1);
-//
-//                    for(int i = 0;i<items.length();i++){
-//                        String item = (String)(((JSONArray) items.get(i)).get(1));
-//                        result.add(item);
-//                    }
-//
-//                } catch (JSONException e) {
-//                    Toast.makeText(LoginActivity.this, "Fail", Toast.LENGTH_SHORT).show();
-//                    Log.e("MYAPP", "unexpected JSON exception", e);
-//                }
-
-
-
-                a = "";
-                for (Element el : elem){
-                    a += el.text() +"\n";
+                else{
+                    return null;
                 }
-
-                for (Element el : elem3){
-                    a += el.text() +"\n";
-                }
-
-
             } catch (IOException e) {
+                Log.e("MYAPP", "error!", e);
                 e.printStackTrace();
             }
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+            if(id.matches("") || pwd.matches("") ){
+                Toast.makeText(LoginActivity.this,"아이디 또는 비밀번호가 입력되지 않았습니다.",Toast.LENGTH_SHORT).show();
+            }else {
+                //로그인
+                if(flag){
+                    Intent intent = new Intent(LoginActivity.this, ListActivity.class);
+                    intent.putExtra("id",id);
+                    intent.putExtra("pwd",pwd);
+                    intent.putExtra("class_name",class_name);
+                    startActivity(intent);
+                    flag = false;
+                }else{
+                    Toast.makeText(LoginActivity.this, "아이디 또는 비밀번호가 잘못됬습니다.", Toast.LENGTH_SHORT).show();
+                }
+            }
             Log.i("TAG",""+a);
             textView.setText(a);
             super.onPostExecute(result);

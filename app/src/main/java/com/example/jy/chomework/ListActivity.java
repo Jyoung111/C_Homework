@@ -1,6 +1,7 @@
 package com.example.jy.chomework;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -8,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -19,6 +22,8 @@ public class ListActivity extends AppCompatActivity {
     public Toolbar toolbar;
     private String id,pwd;
     private ArrayList<String> class_name;
+    private ArrayList<Homework_info> d_day_list;
+    private TextView toolbar_text;
     Intent beforeIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +34,16 @@ public class ListActivity extends AppCompatActivity {
         beforeIntent = getIntent();
         id = beforeIntent.getStringExtra("id");
         pwd = beforeIntent.getStringExtra("pwd");
-        class_name = (ArrayList<String>)getIntent().getSerializableExtra("class_name");
+        class_name = (ArrayList<String>)beforeIntent.getSerializableExtra("class_name");
+        d_day_list = beforeIntent.getParcelableArrayListExtra("d_day_list");
 
+
+        //Adapter로 list전달
         Bundle bundle = new Bundle();
         bundle.putStringArrayList("class_name",class_name);
+        bundle.putParcelableArrayList("d_day_list",d_day_list);
 
-
-
+        toolbar_text = (TextView)findViewById(R.id.toolbar_text);
         viewPager = (ViewPager) findViewById(R.id.pager);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
 
@@ -52,6 +60,23 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+
+                switch (tab.getPosition()){
+                    case 0:
+                        toolbar_text.setText("전체 과제");
+                        break;
+                    case 1:
+                        toolbar_text.setText("끝낸 과제");
+                        break;
+                    case 2:
+                        toolbar_text.setText("수강 과목");
+                        break;
+                    case 3:
+                        toolbar_text.setText("설정");
+                        break;
+
+                }
+
             }
 
             @Override

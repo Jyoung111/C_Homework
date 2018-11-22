@@ -24,7 +24,11 @@ import android.content.Context;
 
 
 public class HomeFragment extends Fragment {
-
+    private ArrayList<Homework_info> d_day_list;
+    private ArrayList<String> d_day = new ArrayList<String>();
+    public ListView list;
+    public View view;
+    Intent beforeIntent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,23 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_now_class, container, false);
+
+        d_day_list = getArguments().getParcelableArrayList("d_day_list");
+        //Log.i("TAG",""+d_day_list);
+
+
+        view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        list = (ListView) view.findViewById(R.id.listView);
+        for(Homework_info homework_info:d_day_list){
+            d_day.add(homework_info.getD_day());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1,
+                d_day);
+        list.setAdapter(adapter);
+
+        //return inflater.inflate(R.layout.fragment_home, container, false);
+        return view;
     }
 }

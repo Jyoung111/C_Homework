@@ -11,7 +11,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/toolbarTransparent"
+        android:elevation="2dp"
+        android:background="@drawable/white_gray_border_bottom"
         >
         <TextView
             android:id="@+id/toolbar_text"

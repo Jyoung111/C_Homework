@@ -1,31 +1,23 @@
 package com.example.jy.chomework;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-        import android.net.Uri;
-        import android.os.Bundle;
-        import android.support.v4.app.Fragment;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-
 
 public class HomeFragment extends Fragment {
-    private ArrayList<Homework_info> d_day_list;
-    private ArrayList<String> d_day = new ArrayList<String>();
+    private ArrayList<Homework_info> not_yet_list;
+    private ArrayList<String> d_day_num = new ArrayList<String>();
+    private ArrayList<Home_ItemData> homework_list = new ArrayList<Home_ItemData>();
     public ListView list;
     public View view;
     Intent beforeIntent;
@@ -40,22 +32,30 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        d_day_list = getArguments().getParcelableArrayList("d_day_list");
+        not_yet_list = getArguments().getParcelableArrayList("not_yet_list");
+        d_day_num = getArguments().getStringArrayList("d_day_num");
         //Log.i("TAG",""+d_day_list);
-
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
         list = (ListView) view.findViewById(R.id.listView);
-        for(Homework_info homework_info:d_day_list){
-            d_day.add(homework_info.getD_day());
+
+        int index = 0;
+        for(Homework_info homework_info:not_yet_list){
+            Home_ItemData home_Item = new Home_ItemData();
+            home_Item.d_day = "D - " + d_day_num.get(index);
+            home_Item.strTitle = homework_info.homework_name;
+            home_Item.strClass_name = homework_info.class_name;
+            home_Item.now_progress = homework_info.now_progress;
+            homework_list.add(home_Item);
+            index++;
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1,
-                d_day);
+
+        HomeCustomAdapter adapter = new HomeCustomAdapter(homework_list);
         list.setAdapter(adapter);
 
         //return inflater.inflate(R.layout.fragment_home, container, false);
         return view;
     }
+
 }

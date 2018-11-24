@@ -14,6 +14,9 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     private int tabCount;
     private Bundle bundle;
     private ArrayList<String> class_name ;
+    private ArrayList<String> d_day_num ;
+    private ArrayList<Homework_info> not_yet_list;
+    private ArrayList<Homework_info> complete_list;
     private ArrayList<Homework_info> d_day_list;
 
     public TabPagerAdapter(FragmentManager fm, int tabCount, Bundle bundle) {
@@ -25,19 +28,23 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         class_name = bundle.getStringArrayList("class_name");
+        not_yet_list = bundle.getParcelableArrayList("not_yet_list");
+        complete_list = bundle.getParcelableArrayList("complete_list");
+        d_day_num = bundle.getStringArrayList("d_day_num");
         d_day_list = bundle.getParcelableArrayList("d_day_list");
-
-        Log.i("TAG",""+class_name);
 
         // Returning the current tabs
         switch (position) {
             case 0:
                 HomeFragment tabFragment1 = new HomeFragment();
-                bundle.putParcelableArrayList("d_day_list",d_day_list);
+                bundle.putParcelableArrayList("not_yet_list",not_yet_list);
+                bundle.putStringArrayList("d_day_num",d_day_num);
                 tabFragment1.setArguments(bundle);
                 return tabFragment1;
             case 1:
                 CompleteFragment tabFragment2 = new CompleteFragment();
+                bundle.putParcelableArrayList("complete_list",complete_list);
+                tabFragment2.setArguments(bundle);
                 return tabFragment2;
             case 2:
                 Now_classFragment tabFragment3 = new Now_classFragment();

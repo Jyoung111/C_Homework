@@ -9,10 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class ListActivity extends AppCompatActivity {
@@ -22,9 +27,17 @@ public class ListActivity extends AppCompatActivity {
     public Toolbar toolbar;
     private String id,pwd;
     private ArrayList<String> class_name;
-    private ArrayList<Homework_info> d_day_list;
+    private ArrayList<Homework_info> d_day_list = new ArrayList<Homework_info>();
+    private ArrayList<Homework_info> not_yet_list= new ArrayList<Homework_info>();
+    private ArrayList<String> d_day_num = new ArrayList<String>();
+    private ArrayList<Homework_info> complete_list= new ArrayList<Homework_info>();
     private TextView toolbar_text;
     Intent beforeIntent;
+    long calDate,now;
+    Date FirstDate;
+    SimpleDateFormat format;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +50,34 @@ public class ListActivity extends AppCompatActivity {
         class_name = (ArrayList<String>)beforeIntent.getSerializableExtra("class_name");
         d_day_list = beforeIntent.getParcelableArrayListExtra("d_day_list");
 
+        //기간 남은 과제, 해결한 과제 분류
+        int index = 0;
+        for(Homework_info homework_info:d_day_list){
+            try {
+                now = System.currentTimeMillis();
+                format = new SimpleDateFormat("yyyy.MM.dd a K:mm", Locale.KOREA);
+                FirstDate = format.parse(homework_info.getD_day());
+                calDate = FirstDate.getTime();
+                if(calDate - now > 0 && homework_info.getNow_progress().equals("미제출")){
+                    long diffday = (calDate - now) / (24 * 60 * 60 * 1000);
+                    not_yet_list.add(homework_info);
+                    d_day_num.add(String.valueOf(diffday));
+                }else{
+                    complete_list.add(homework_info);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            index++;
+        }
+
 
         //Adapter로 list전달
         Bundle bundle = new Bundle();
         bundle.putStringArrayList("class_name",class_name);
-        bundle.putParcelableArrayList("d_day_list",d_day_list);
+        bundle.putParcelableArrayList("not_yet_list",not_yet_list);
+        bundle.putParcelableArrayList("complete_list",complete_list);
+        bundle.putStringArrayList("d_day_num",d_day_num);
 
         toolbar_text = (TextView)findViewById(R.id.toolbar_text);
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -64,15 +100,31 @@ public class ListActivity extends AppCompatActivity {
                 switch (tab.getPosition()){
                     case 0:
                         toolbar_text.setText("전체 과제");
+                        tabLayout.getTabAt(0).setIcon(R.drawable.clicked_calendar);
+                        tabLayout.getTabAt(1).setIcon(R.drawable.complete);
+                        tabLayout.getTabAt(2).setIcon(R.drawable.list);
+                        tabLayout.getTabAt(3).setIcon(R.drawable.settings);
                         break;
                     case 1:
                         toolbar_text.setText("끝낸 과제");
+                        tabLayout.getTabAt(0).setIcon(R.drawable.calendar);
+                        tabLayout.getTabAt(1).setIcon(R.drawable.clicked_complete);
+                        tabLayout.getTabAt(2).setIcon(R.drawable.list);
+                        tabLayout.getTabAt(3).setIcon(R.drawable.settings);
                         break;
                     case 2:
                         toolbar_text.setText("수강 과목");
+                        tabLayout.getTabAt(0).setIcon(R.drawable.calendar);
+                        tabLayout.getTabAt(1).setIcon(R.drawable.complete);
+                        tabLayout.getTabAt(2).setIcon(R.drawable.clicked_list);
+                        tabLayout.getTabAt(3).setIcon(R.drawable.settings);
                         break;
                     case 3:
                         toolbar_text.setText("설정");
+                        tabLayout.getTabAt(0).setIcon(R.drawable.calendar);
+                        tabLayout.getTabAt(1).setIcon(R.drawable.complete);
+                        tabLayout.getTabAt(2).setIcon(R.drawable.list);
+                        tabLayout.getTabAt(3).setIcon(R.drawable.clicked_settings);
                         break;
 
                 }

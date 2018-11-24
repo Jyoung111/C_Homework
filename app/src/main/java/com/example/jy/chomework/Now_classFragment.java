@@ -32,7 +32,6 @@ public class Now_classFragment extends Fragment {
         // Inflate the layout for this fragment
 
         class_name = getArguments().getStringArrayList("class_name");
-        Log.i("TAG",""+class_name);
 
 
         view = inflater.inflate(R.layout.fragment_now_class, container, false);

@@ -37,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
     private ArrayList<String> class_name = new ArrayList<String>();
     private ArrayList<String> kj_list = new ArrayList<String>();
     private ArrayList<String> homework_list = new ArrayList<String>();
+    private ArrayList<String> homework_name_list = new ArrayList<String>();
+    private ArrayList<String> progress_list = new ArrayList<String>();
     private ArrayList<Homework_info> d_day_list = new ArrayList<Homework_info>();
 
     @Override
@@ -133,12 +135,12 @@ public class LoginActivity extends AppCompatActivity {
                 for (Element el : elem) {
                     String id_elem = el.attr("kj");
                     kj_list.add(id_elem);
+                    class_name.add(el.text());
                 }
 
-
-
                 //모든 과제 링크 수집
-                for (String kj : kj_list) {
+                int index1=0,index2 = 0;
+                for (String kj: kj_list) {
                     homework_list.clear();
                     Document doc4 = Jsoup.connect("http://clc.chosun.ac.kr/ilos/st/course/eclass_room2.acl")
                             .cookies(loginTryCookie)
@@ -165,11 +167,16 @@ public class LoginActivity extends AppCompatActivity {
 
                         Document doc5 = response5.parse();
                         Elements elem3 = doc5.select("table>tbody>tr>td>a.site-link");
+                        Elements elem4 = doc5.select("table>tbody>tr>td:eq(6)");
 
                         for (Element el : elem3) {
                             String homework_url = "http://clc.chosun.ac.kr" + el.attr("href");
                             homework_list.add(homework_url);
                         }
+                        for (Element el : elem4) {
+                            progress_list.add(el.text());
+                        }
+
 
                         for(String url:homework_list) {
                             Connection.Response response6 = Jsoup.connect(url)
@@ -179,27 +186,25 @@ public class LoginActivity extends AppCompatActivity {
                                     .execute();
 
                             Document doc6 = response6.parse();
-                            Elements elem6 = doc6.select("table.bbsview>tbody>tr:eq(3)");
-                            Elements elem7 = doc6.select("table.bbsview>tbody>tr:eq(0)");
+                            Elements elem6 = doc6.select("table.bbsview>tbody>tr:eq(3)>td");
+                            Elements elem7 = doc6.select("table.bbsview>tbody>tr:eq(0)>td");
 
                             for (int i = 0;i<elem6.size();i++) {
-                                d_day_list.add(new Homework_info(elem7.get(i).text(),elem6.get(i).text()));
+                                d_day_list.add(new Homework_info(elem7.get(i).text(),elem6.get(i).text(), class_name.get(index1),progress_list.get(index2)));
                                 a += elem6.text() + "\n";
                             }
+                            index2++;
                        }
 
-
-
+                index1++;
 
                 } else {
                     return null;
                 }
+
             }
 
-            //현재 수강중인 강의 목록 ArrayList에 추가
-            for (Element el : elem){
-                class_name.add(el.text()+"\n");
-            }
+
 
             } catch(IOException e){
                 Log.e("MYAPP", "error!", e);

@@ -40,20 +40,20 @@
         android:layout_height="0dp"
         android:layout_gravity="bottom"
         android:layout_weight="1"
-        app:tabIndicatorColor="@android:color/holo_orange_light"
+        app:tabIndicatorColor="#006DF0"
         app:tabIndicatorGravity="top">
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/calendar" />
+            android:icon="@drawable/clicked_calendar" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabItem2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/correct" />
+            android:icon="@drawable/complete" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabItem4"

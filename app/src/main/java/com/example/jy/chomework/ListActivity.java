@@ -1,7 +1,9 @@
 package com.example.jy.chomework;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Parcelable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -16,6 +18,9 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -37,7 +42,6 @@ public class ListActivity extends AppCompatActivity {
     Date FirstDate;
     SimpleDateFormat format;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +54,9 @@ public class ListActivity extends AppCompatActivity {
         class_name = (ArrayList<String>)beforeIntent.getSerializableExtra("class_name");
         d_day_list = beforeIntent.getParcelableArrayListExtra("d_day_list");
 
+        Collections.sort(d_day_list);
+
         //기간 남은 과제, 해결한 과제 분류
-        int index = 0;
         for(Homework_info homework_info:d_day_list){
             try {
                 now = System.currentTimeMillis();
@@ -68,8 +73,17 @@ public class ListActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            index++;
         }
+
+
+
+//        Collections.sort(d_day_list, new Comparator<Homework_info>() {
+//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//            @Override
+//            public int compare(Homework_info o1, Homework_info o2) {
+//                return Long.compare(o1.calDate,o2.calDate);
+//            }
+//        });
 
 
         //Adapter로 list전달
@@ -141,8 +155,20 @@ public class ListActivity extends AppCompatActivity {
 
             }
         });
-
-
-
     }
+
+    private class d_day implements Comparable<d_day>{
+
+
+
+        public d_day() {
+        }
+
+        @Override
+        public int compareTo(d_day o) {
+            return 0;
+        }
+    }
+
+
 }

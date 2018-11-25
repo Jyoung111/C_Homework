@@ -32,6 +32,7 @@ public class CompleteFragment extends Fragment {
             Complete_ItemData complete_itemData = new Complete_ItemData();
             complete_itemData.strTitle = homework_info.getHomework_name();
             complete_itemData.strClass_name = homework_info.getClass_name();
+            complete_itemData.end_date = homework_info.getD_day();
             complete_itemData.now_progress = homework_info.getNow_progress();
             homework_list.add(complete_itemData);
         }

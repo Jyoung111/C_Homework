@@ -1,12 +1,11 @@
 package com.example.jy.chomework;
 
 import android.content.Context;
-import android.os.Bundle;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -50,14 +49,23 @@ public class HomeCustomAdapter extends BaseAdapter {
         }
 
         TextView textTitle = (TextView)convertView.findViewById(R.id.textTitle);
-        TextView textDate = (TextView)convertView.findViewById(R.id.textDate);
+        TextView class_name = (TextView)convertView.findViewById(R.id.class_name);
         TextView dday = (TextView)convertView.findViewById(R.id.ddayView);
         TextView now_progress = (TextView)convertView.findViewById(R.id.now_progress);
 
         textTitle.setText(home_data.get(position).strTitle);
-        textDate.setText(home_data.get(position).strClass_name);
+        class_name.setText(home_data.get(position).strClass_name);
         dday.setText(home_data.get(position).d_day);
         now_progress.setText(home_data.get(position).now_progress);
+        //제출 =  초록색, 미제출 = 주황색, 평가완료 = 회색
+        if(home_data.get(position).now_progress.equals("제출")){
+            now_progress.setTextColor(Color.parseColor("#6c9f20"));
+        }else if(home_data.get(position).now_progress.equals("평가완료")){
+            now_progress.setTextColor(Color.parseColor("#969696"));
+        }
+        else{
+            now_progress.setTextColor(Color.parseColor("#ff8c40"));
+        }
 
         return convertView;
     }

@@ -21,8 +21,12 @@ import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
@@ -49,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
 
         idText = (EditText)findViewById(R.id.idText);
         passText = (EditText)findViewById(R.id.passText);
-        textView = (TextView) findViewById(R.id.textView);
 
     }
 
@@ -190,7 +193,7 @@ public class LoginActivity extends AppCompatActivity {
                             Elements elem7 = doc6.select("table.bbsview>tbody>tr:eq(0)>td");
 
                             for (int i = 0;i<elem6.size();i++) {
-                                d_day_list.add(new Homework_info(elem7.get(i).text(),elem6.get(i).text(), class_name.get(index1),progress_list.get(index2)));
+                                d_day_list.add(new Homework_info(elem7.get(i).text(), elem6.get(i).text(), class_name.get(index1), progress_list.get(index2)));
                                 a += elem6.text() + "\n";
                             }
                             index2++;
@@ -204,14 +207,10 @@ public class LoginActivity extends AppCompatActivity {
 
             }
 
-
-
             } catch(IOException e){
                 Log.e("MYAPP", "error!", e);
                 e.printStackTrace();
             }
-
-
             return null;
         }
 
@@ -233,7 +232,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "아이디 또는 비밀번호가 잘못됬습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
-            textView.setText(a);
             super.onPostExecute(result);
         }
     }

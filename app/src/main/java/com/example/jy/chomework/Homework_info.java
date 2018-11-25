@@ -1,9 +1,16 @@
 package com.example.jy.chomework;
 
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.RequiresApi;
 
-public class Homework_info implements Parcelable {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class Homework_info implements Parcelable, Comparable<Homework_info>{
     String homework_name;
     String d_day;
     String class_name;
@@ -14,6 +21,8 @@ public class Homework_info implements Parcelable {
         this.d_day = d_day;
         this.class_name = class_name;
         this.now_progress = now_progress;
+
+
     }
 
     protected Homework_info(Parcel in) {
@@ -62,5 +71,24 @@ public class Homework_info implements Parcelable {
 
     public String getNow_progress() {
         return now_progress;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public int compareTo(Homework_info other) {
+        long calDate =0 ,calDate1=0;
+        Date FirstDate,FirstDate1;
+        SimpleDateFormat format;
+
+        try {
+            format = new SimpleDateFormat("yyyy.MM.dd a K:mm", Locale.KOREA);
+            FirstDate = format.parse(this.d_day);
+            FirstDate1 = format.parse(other.d_day);
+            calDate = FirstDate.getTime();
+            calDate1 = FirstDate1.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return Long.compare(calDate1, calDate);
     }
 }

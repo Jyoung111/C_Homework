@@ -1,6 +1,7 @@
 package com.example.jy.chomework;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
@@ -14,7 +15,11 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +27,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 
 public class ListActivity extends AppCompatActivity {
@@ -31,8 +38,8 @@ public class ListActivity extends AppCompatActivity {
     public ViewPager viewPager;
     public Toolbar toolbar;
     private String id,pwd;
-    private ArrayList<String> class_name;
-    private ArrayList<Homework_info> d_day_list = new ArrayList<Homework_info>();
+    private ArrayList<String> class_name= new ArrayList<String>();
+    private ArrayList<Homework_info> d_day_list= new ArrayList<Homework_info>();
     private ArrayList<Homework_info> not_yet_list= new ArrayList<Homework_info>();
     private ArrayList<String> d_day_num = new ArrayList<String>();
     private ArrayList<Homework_info> complete_list= new ArrayList<Homework_info>();
@@ -43,16 +50,31 @@ public class ListActivity extends AppCompatActivity {
     SimpleDateFormat format;
 
     @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        //로그인 화면 인텐트에서 getExtra()로 넘겨준 값을 저장
         beforeIntent = getIntent();
         id = beforeIntent.getStringExtra("id");
         pwd = beforeIntent.getStringExtra("pwd");
-        class_name = (ArrayList<String>)beforeIntent.getSerializableExtra("class_name");
-        d_day_list = beforeIntent.getParcelableArrayListExtra("d_day_list");
+
+        //로그인 화면 인텐트에서 getExtra()로 넘겨준 값을 저장
+        SharedPreferences prefs = getSharedPreferences("activity_login",0);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Homework_info>>(){}.getType();
+        String json = prefs.getString("d_day_list", "");
+        d_day_list = gson.fromJson(json, type);
+        class_name = new ArrayList<String>(prefs.getStringSet("class_name", null));
+
+        if(d_day_list.isEmpty() || class_name.isEmpty()){
+            class_name = (ArrayList<String>)beforeIntent.getSerializableExtra("class_name");
+            d_day_list = beforeIntent.getParcelableArrayListExtra("d_day_list");
+        }
 
         Collections.sort(d_day_list);
 
@@ -74,17 +96,6 @@ public class ListActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-
-
-//        Collections.sort(d_day_list, new Comparator<Homework_info>() {
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public int compare(Homework_info o1, Homework_info o2) {
-//                return Long.compare(o1.calDate,o2.calDate);
-//            }
-//        });
-
 
         //Adapter로 list전달
         Bundle bundle = new Bundle();
@@ -120,7 +131,7 @@ public class ListActivity extends AppCompatActivity {
                         tabLayout.getTabAt(3).setIcon(R.drawable.settings);
                         break;
                     case 1:
-                        toolbar_text.setText("끝낸 과제");
+                        toolbar_text.setText("지난 과제");
                         tabLayout.getTabAt(0).setIcon(R.drawable.calendar);
                         tabLayout.getTabAt(1).setIcon(R.drawable.clicked_complete);
                         tabLayout.getTabAt(2).setIcon(R.drawable.list);
@@ -156,19 +167,4 @@ public class ListActivity extends AppCompatActivity {
             }
         });
     }
-
-    private class d_day implements Comparable<d_day>{
-
-
-
-        public d_day() {
-        }
-
-        @Override
-        public int compareTo(d_day o) {
-            return 0;
-        }
-    }
-
-
 }

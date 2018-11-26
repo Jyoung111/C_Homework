@@ -1,6 +1,7 @@
 package com.example.jy.chomework;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,12 +29,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private boolean flag = false;
+    private boolean flag;
     public Button button;
     public EditText idText;
     public EditText passText;
@@ -53,30 +58,28 @@ public class LoginActivity extends AppCompatActivity {
 
         idText = (EditText)findViewById(R.id.idText);
         passText = (EditText)findViewById(R.id.passText);
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                //Https 접속을 위한 코드
                 SSLConnect ssl = new SSLConnect();
                 ssl.postHttps("https://clc.chosun.ac.kr/ilos/lo/login.acl",1000,1000);
+
                 id = idText.getText().toString();
                 pwd =  passText.getText().toString();
-
-                new Web_Login().execute();
-
+                new Parsing().execute();
             }
         });
     }
 
-    public class Web_Login extends AsyncTask<Void, Void, Void> {
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
 
+    public class Parsing extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -86,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-        try {
+            try {
 
                 String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
 
@@ -197,15 +200,15 @@ public class LoginActivity extends AppCompatActivity {
                                 a += elem6.text() + "\n";
                             }
                             index2++;
-                       }
+                        }
 
-                index1++;
+                        index1++;
 
-                } else {
-                    return null;
+                    } else {
+                        return null;
+                    }
+
                 }
-
-            }
 
             } catch(IOException e){
                 Log.e("MYAPP", "error!", e);
@@ -216,23 +219,40 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
             if(id.matches("") || pwd.matches("") ){
                 Toast.makeText(LoginActivity.this,"아이디 또는 비밀번호가 입력되지 않았습니다.",Toast.LENGTH_SHORT).show();
             }else {
                 //로그인
                 if(flag){
                     Intent intent = new Intent(LoginActivity.this, ListActivity.class);
-                    intent.putExtra("id",id);
-                    intent.putExtra("pwd",pwd);
                     intent.putExtra("class_name",class_name);
                     intent.putParcelableArrayListExtra("d_day_list",d_day_list);
                     startActivity(intent);
-                    flag = false;
                 }else{
                     Toast.makeText(LoginActivity.this, "아이디 또는 비밀번호가 잘못됬습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
-            super.onPostExecute(result);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences prefs = getSharedPreferences("activity_login",0);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        Set<String> class_name_set = new HashSet<String>(class_name);
+
+        //Gson 방식으로 preference에 넘겨준다.
+        //preference 데이터 전달
+        Gson gson = new Gson();
+        String json = gson.toJson(d_day_list);
+        editor.putString("d_day_list", json);
+        editor.putStringSet("class_name",class_name_set);
+        editor.putString("id",id);
+        editor.putString("pwd",pwd);
+        editor.putBoolean("login_flag",flag);
+        editor.apply();
     }
 }

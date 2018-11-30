@@ -18,6 +18,7 @@ public class CustomProgressDialog extends Dialog {
         setCancelable(false);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.custom_dialog);
+
         ImageView gifImageView = this.findViewById(R.id.loading_gif);
         //Glide로 GIF 적용
         Glide.with(context).asGif().load(R.drawable.loading_gif).into(gifImageView);

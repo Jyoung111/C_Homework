@@ -58,7 +58,7 @@ public class BootingActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             }
-        },2000);
+        },1000);
     }
     private class CheckTypesTask extends AsyncTask<Void, Void, Void> {
 
